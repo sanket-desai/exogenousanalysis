@@ -82,10 +82,13 @@ class DNAMSAFeatures(object):
                 cluststart=cindex
             elif i=="-" and cluststart>-1 and clustend==-1:
                 clustend=cindex-1
-                if clustend-cluststart+1 >= 1:
+                if clustend-cluststart+1 >= 10:
                     cc=ConservedCluster("clust_"+str(cluststart)+"_"+str(clustend), cluststart, clustend, "".join(self.conserved_residue_list_[cluststart:clustend+1]) )
                     print(str(cc))
                     consclustlist.append(cc)
+                    cluststart=-1
+                    clustend=-1
+                else:
                     cluststart=-1
                     clustend=-1
             cindex+=1
