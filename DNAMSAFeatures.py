@@ -3,6 +3,7 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
+import sys
 
 class ConservedCluster(object):
     def __init__(self, name, start, end, sequence):
@@ -19,20 +20,22 @@ class DNAMSAFeatures(object):
         self.alignment_= AlignIO.read(open(fname),format)
         self.purines_="AG"
         self.pyrimidines_="CT"
-        self.conserved_residue_list_=self.get_conserved_residues_as_list()
+        self.conserved_residue_list_=self.get_conserved_nucleotides_as_list()
     def get_column_as_list(self,index):
         return list(self.alignment_[:,index])
-    def get_unique_residues_in_column_as_list(self,index):
+    def get_unique_elements_in_column_as_list(self,index):
         return list(set(list(self.alignment_[:,index])))
     def is_column_conserved(self,index):
         li=self.get_unique_elements_in_column_as_list(index)
+        if li == None:
+            print(self.get_)
         if len(li)==1:
             return True
         elif len(li)==2:
             return (li[0] in self.purines_ and li[1] in self.purines_) or (li[0] in self.pyrimidines_ and li[1] in self.pyrimidines_)
         else:
             return False
-    def get_column_residue(self,index):
+    def get_column_element(self,index):
         li=self.get_unique_elements_in_column_as_list(index)
         if len(li)==1:
             return li[0]
@@ -41,15 +44,17 @@ class DNAMSAFeatures(object):
                 return "R"
             elif li[0] in self.pyrimidines_ and li[1] in self.pyrimidines_:
                 return "Y"
+            else:
+                return "-"
         else:
             return "-"
-    def get_conserved_residues_as_list(self):
+    def get_conserved_nucleotides_as_list(self):
         conres=[]
         cres=""
         for i in range(0, self.alignment_.get_alignment_length()):
-            conres.append(self.get_column_residue())
+            conres.append(self.get_column_element(i))
         return conres
-    def get_residue_number_from_column_index(self, id, col):
+    def get_sequence_number_from_column_index(self, id, col):
         rec = next((r for r in aln if r.id == id), None)
         j = 0
         rn=0
@@ -69,15 +74,17 @@ class DNAMSAFeatures(object):
         clustend=-1
         cindex=0
         consclustlist=[]
-        for i in self.get_conserved_residues_as_list():
+        #print(self.get_conserved_nucleotides_as_list())
+        for i in self.get_conserved_nucleotides_as_list():
             if i=="-" and cluststart==-1:
                 pass
             elif i!="-" and cluststart==-1:
                 cluststart=cindex
             elif i=="-" and cluststart>-1 and clustend==-1:
-                clustend=cindex
-                if clustend-cluststart+1 > 10:
+                clustend=cindex-1
+                if clustend-cluststart+1 >= 1:
                     cc=ConservedCluster("clust_"+str(cluststart)+"_"+str(clustend), cluststart, clustend, "".join(self.conserved_residue_list_[cluststart:clustend+1]) )
+                    print(str(cc))
                     consclustlist.append(cc)
                     cluststart=-1
                     clustend=-1
@@ -89,3 +96,14 @@ class DNAMSAFeatures(object):
             fo.write(str(c))
             fo.write("\n")
         fo.close()
+
+def main():
+    if len(sys.argv)!=3:
+        print("usage: DNAMSAFeatures.py msafile outputfile")
+        sys.exit(0)
+    else:
+        d=DNAMSAFeatures(sys.argv[1])
+        d.write_conserved_clusters_to_file(sys.argv[2])
+        print("Compute success!!")
+if __name__=="__main__":
+    main()
