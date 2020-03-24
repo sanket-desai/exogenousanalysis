@@ -28,7 +28,8 @@ class DNAMSAFeatures(object):
     def is_column_conserved(self,index):
         li=self.get_unique_elements_in_column_as_list(index)
         if li == None:
-            print(self.get_)
+            print("Bad alignment file!!")
+            sys.exit(0)
         if len(li)==1:
             return True
         elif len(li)==2:
@@ -40,9 +41,9 @@ class DNAMSAFeatures(object):
         if len(li)==1:
             return li[0]
         elif len(li)==2:
-            if li[0] in self.purines_ and li[1] in self.purines_:
+            if li[0].upper() in self.purines_ and li[1].upper() in self.purines_:
                 return "R"
-            elif li[0] in self.pyrimidines_ and li[1] in self.pyrimidines_:
+            elif li[0].upper() in self.pyrimidines_ and li[1].upper() in self.pyrimidines_:
                 return "Y"
             else:
                 return "-"
@@ -82,7 +83,7 @@ class DNAMSAFeatures(object):
                 cluststart=cindex
             elif i=="-" and cluststart>-1 and clustend==-1:
                 clustend=cindex-1
-                if clustend-cluststart+1 >= 10:
+                if clustend-cluststart+1 >= 1:
                     cc=ConservedCluster("clust_"+str(cluststart)+"_"+str(clustend), cluststart, clustend, "".join(self.conserved_residue_list_[cluststart:clustend+1]) )
                     print(str(cc))
                     consclustlist.append(cc)
