@@ -22,7 +22,6 @@ def main():
                 if f.type == sys.argv[2]:
                     print(f.location.end)
                     for q1 in f.qualifiers:
-                        print(q1)
                         if q1 == 'gene':
                             sid=srec.id+"__"+f.type+"__"+str(f.location.start)+"__"+str(f.location.end)+"__"+f.qualifiers[q1][0]
                 featrecord=SeqRecord(f.extract(srec.seq), id=sid, name="", description="")
