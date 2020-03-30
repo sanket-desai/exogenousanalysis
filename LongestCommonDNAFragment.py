@@ -28,6 +28,15 @@ class LongestCommonFragment(object):
                     elif c == longest:
                         lcs_set.add(S[i-c+1:i+1])
         return lcs_set
+    def lcs_seqrecords(sr1, sr2):
+        naame=sr1.name+"__"+sr2.name
+        if len(name) > 20:
+            naame="__"+sr1[:7]
+        lset=self.lcs( str(sr1.seq), str(sr2.seq))
+        lsrecs=[]
+        for ls in lset:
+            lsrecs.append( SeqRecord( Seq(ls), id=naame, name="", description="" ) )
+        return lsrecs
     #x is the min length
     def topcs(self, S,T,x):
         m = len(S)
@@ -47,20 +56,59 @@ class LongestCommonFragment(object):
                     #elif c == longest:
                     #lcs_set.add(S[i-c+1:i+1])
         return lcs_set
+    def topcs_seqrecords(sr1, sr2,x):
+        naame=sr1.name+"__"+sr2.name
+        if len(name) > 20:
+            naame="__"+sr1[:7]
+        lset=self.topcs( str(sr1.seq), str(sr2.seq),x)
+        lsrecs=[]
+        for ls in lset:
+            lsrecs.append( SeqRecord( Seq(ls), id=naame, name="", description="" ) )
+        return lsrecs
+    def topcs_fragments(sr1, sr2,x):
+        frags=[]
+        tseqs=self.topcs_seqrecords(sr1,sr2, x)
+        for i in tseqs:
+            frags.append(str(tseqs.seq))
+        return list(set(frags))
     def get_number_of_sequences(self):
         return len(self.farecords_)
     #x is the min fragment length
-    def get_common_fragment_set_as_seqrecord_list(self, inda, indb, x):
+    def get_common_fragment_set_as_seqrecord_list(self, inda, indb, x=10):
         nid=self.farecords_[inda].id+"__"+self.farecords_[indb].id
         nname=self.farecords_[inda].name+"__"+self.farecords_[indb].name
         #return SeqRecord(seq=self.longestSubstring(self.farecords_[inda].seq, self.farecords_[indb].seq), id=nid, name=nname)
         seqsrno=1
         seqrecs=[]
-        for e in self.lcs(str(self.farecords_[inda].seq), str(self.farecords_[indb].seq),x):
+        for e in self.topcs(str(self.farecords_[inda].seq), str(self.farecords_[indb].seq),x):
             sss=SeqRecord(Seq( e ,generic_dna),id=nid+"__"+str(seqsrno) , name=nname+"__"+str(seqsrno) )
             seqrecs.append(sss)
             seqsrno+=1
         return seqrecs
+    def topcs_fragments(self, frag, seqrec, x=10):
+        temprec=[]
+        if type(seqrec) == "SeqRecord":
+            temprec=self.topcs( frag, str(seqrec.seq), x )
+        else:
+            temprec=self.topcs(frag, seqrec, x)
+        return list(set(temprec))
+    def get_topcs_fragments(self, fraglist, seqreclist, x=10):
+        tempfraglist=[]
+        for s in seqreclist:
+            for f in fraglist:
+                tcf=self.topcs_fragments(f, s, x)
+                for t in tcf:
+                    if not t in tempfraglist:
+                        tempfraglist.append(t)
+        return tempfraglist
+    def get_common_fragments(self,x):
+        tempfrags=[]
+        if self.get_number_of_sequences() == 1:
+            tempfrags=[str(self.farecords_[0].seq)]
+        elif self.get_number_of_sequences() > 1:
+            tempfrags=self.topcs_fragments(self.farecords_[0], self.farecords_[1], x)
+            tempfrags=self.get_topcs_fragments(tempfrags, self.farecords_[1:],x)
+        return tempfrags
     def get_longest_common_fragment_set_as_seqrecord_list(self, inda, indb):
         nid=self.farecords_[inda].id+"__"+self.farecords_[indb].id
         nname=self.farecords_[inda].name+"__"+self.farecords_[indb].name
@@ -100,8 +148,11 @@ def main():
         sys.exit(0)
     else:
         l=LongestCommonFragment(sys.argv[1])
-        print("Object created!! Computing...")
-        l.write_longest_common_framgments_as_fasta(sys.argv[2])
+        #print("Object created!! Computing...")
+        a=l.get_common_fragments(10)
+        for i in a:
+            print(a)
+        #l.write_longest_common_framgments_as_fasta(sys.argv[2])
         #slist=l.get_longest_common_fragment_set_as_seqrecord_list(1,2)
         #for s in slist:
         #    print(s)
