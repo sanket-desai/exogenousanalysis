@@ -1,0 +1,32 @@
+Licencing terms of AGA program remain unchanged (please refer to LICENCE.txt for further information) and copyright remains with the original author of this program. Modification of this program was done for generation of tabulation of the output given by the AGA.
+
+AGA aligner takes into account the coding region context (CDS and Protein) and aligns nucleotide sequences given as input to the genbank file provided as a reference database. The output given by the program is in the fasta format (aligned files). However, the program also produces a verbose description of the alignment with the genome, CDS and the protein. To make the output in a script readable format, the following files were modified from the /src directory:
+	* Aga.cpp
+	* SimpleScorer.cpp
+
+The original AGA (entry program still exists in the /src directory as Aga_orig.cpp. Installation instructions of the modified AGA program are same as given in the README.md file.
+
+Further the STDOUT from the 'aga' program is saved into a text format file using commandline.
+I prefer to call this file as AGA SSV (semicolon separated values) file which looks like this:
+'''
+
+##reference:NC_038294.1
+#query:ORF1b_N1_literature
+#genome:NC_038294.1;begin:18739;end:18869;coverage:0.4351;score:78;quality:0.5954;concordance:29.77;matches:131;matchpercent:100;identitites:85;identitypercent:64.89;inserts:0;deletes:0;misaligned:0;frameshifts:0
+#CDS:1_orf1ab;begin:18739;end:18869;coverage:0.4351;score:78;quality:0.5954;concordance:29.77;matches:131;matchpercent:100;identitites:85;identitypercent:64.89;inserts:0;deletes:0;misaligned:0;frameshifts:01_orf1ab;;begin:6155;end:6198;coverage:0.6216;score:278;quality:6.318;concordance:78.75;matches:44;matchpercent:100;identitites:30;identitypercent:68.18;inserts:0;deletes:0;misaligned:0;frameshifts:0
+#protein:YP_007188577.3 ORF1b protein;begin:6155;end:6198;coverage:0.6216;score:278;quality:6.318;concordance:78.75;matches:44;matchpercent:100;identitites:30;identitypercent:68.18;inserts:0;deletes:0;misaligned:0;frameshifts:0
+##reference:NC_045512.2
+#query:ORF1b_N1_literature
+#genome:NC_045512.2;begin:18778;end:18908;coverage:0.4381;score:262;quality:2;concordance:100;matches:131;matchpercent:100;identitites:131;identitypercent:100;inserts:0;deletes:0;misaligned:0;frameshifts:0
+#CDS:1_orf1ab;begin:18778;end:18908;coverage:0.4381;score:262;quality:2;concordance:100;matches:131;matchpercent:100;identitites:131;identitypercent:100;inserts:0;deletes:0;misaligned:0;frameshifts:01_orf1ab;;begin:6172;end:6215;coverage:0.62;score:359;quality:8.159;concordance:98.63;matches:44;matchpercent:100;identitites:43;identitypercent:97.73;inserts:0;deletes:0;misaligned:0;frameshifts:0
+#protein:YP_009724389.1 orf1ab polyprotein;begin:6172;end:6215;coverage:0.62;score:359;quality:8.159;concordance:98.63;matches:44;matchpercent:100;identitites:43;identitypercent:97.73;inserts:0;deletes:0;misaligned:0;frameshifts:0
+#protein:YP_009725309.1 3'-to-5' exonuclease;begin:247;end:290;coverage:8.349;score:359;quality:8.159;concordance:98.63;matches:44;matchpercent:100;identitites:43;identitypercent:97.73;inserts:0;deletes:0;misaligned:0;frameshifts:0
+
+'''
+As seen from the above example, '##' marks the start of new record and rest of the values are saved as a pair (later parsed into the Map or list of Maps).
+
+A parser program (python script) is present within the aga-master-edit directory which prints the tabular format of all the alignments which are saved in the SSV file.
+
+Name: Sanket Desai
+Date: 30/03/2020
+E-mail: desai.sanket12<at>gmail<dot>com

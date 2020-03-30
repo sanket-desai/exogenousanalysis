@@ -41,6 +41,6 @@ def main():
                             SeqIO.write(featrecord, fo, "fasta")
                 #print(f.extract(srec.seq))
             #print(srec.features[0])
-
+#python3 ExtractGeneNucleotideFromGenbankGenome.py <genbankgenomesfile> gene <ouputdir>
 if __name__ == "__main__":
     main()
