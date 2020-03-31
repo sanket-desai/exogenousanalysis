@@ -10,6 +10,8 @@ class LongestCommonFragment(object):
         self.farecords_=[]
         for r in SeqIO.parse(ifa,format):
             self.farecords_.append(r)
+    def get_number_of_sequences(self):
+        return len(self.farecords_)
     def lcs(self, S,T):
         m = len(S)
         n = len(T)
@@ -55,25 +57,20 @@ class LongestCommonFragment(object):
                         lcs_set.add(S[i-c+1:i+1])
                     #elif c == longest:
                     #lcs_set.add(S[i-c+1:i+1])
-        return lcs_set
-    def topcs_seqrecords(sr1, sr2,x):
-        naame=sr1.name+"__"+sr2.name
-        if len(name) > 20:
-            naame="__"+sr1[:7]
-        lset=self.topcs( str(sr1.seq), str(sr2.seq),x)
-        lsrecs=[]
-        for ls in lset:
-            lsrecs.append( SeqRecord( Seq(ls), id=naame, name="", description="" ) )
-        return lsrecs
-    def topcs_fragments(sr1, sr2,x):
-        frags=[]
-        tseqs=self.topcs_seqrecords(sr1,sr2, x)
-        for i in tseqs:
-            frags.append(str(tseqs.seq))
-        return list(set(frags))
-    def get_number_of_sequences(self):
-        return len(self.farecords_)
+        keeplcs_set=[]
+        for l1 in lcs_set:
+            for l2 in lcs_set:
+                if l1!=l2:
+                    if l1 in l2 or l2 in l1:
+                        if len(l1) > len(l2):
+                            keeplcs_set.append(l1)
+                        else:
+                            keeplcs_set.append(l2)
+        return keeplcs_set #lcs_set
     #x is the min fragment length
+    def topcs_fragments_from_seqrecords(sr1, sr2,x):
+        lset=self.topcs( str(sr1.seq), str(sr2.seq),x)
+        return lset
     def get_common_fragment_set_as_seqrecord_list(self, inda, indb, x=10):
         nid=self.farecords_[inda].id+"__"+self.farecords_[indb].id
         nname=self.farecords_[inda].name+"__"+self.farecords_[indb].name
@@ -87,11 +84,15 @@ class LongestCommonFragment(object):
         return seqrecs
     def topcs_fragments(self, frag, seqrec, x=10):
         temprec=[]
-        if type(seqrec) == "SeqRecord":
+        if isinstance(frag, str) and isinstance(seqrec, SeqRecord):
             temprec=self.topcs( frag, str(seqrec.seq), x )
-        else:
+        elif isinstance(frag, SeqRecord) and isinstance(seqrec, str):
+            temprec=self.topcs( str(frag.seq), seqrec, x )
+        elif isinstance(frag, SeqRecord) and isinstance(seqrec, SeqRecord):
+            temprec=self.topcs( str(frag.seq), str(seqrec.seq),x)
+        elif isinstance(frag, str) and isinstance(seqrec, str):
             temprec=self.topcs(frag, seqrec, x)
-        return list(set(temprec))
+        return temprec
     def get_topcs_fragments(self, fraglist, seqreclist, x=10):
         tempfraglist=[]
         for s in seqreclist:
